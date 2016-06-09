@@ -16,7 +16,7 @@ import (
 	"strconv"
 	"strings"
 	"time"
-
+	"os"
 	"github.com/akrennmair/cabinet/basicauth"
 	"github.com/akrennmair/cabinet/data"
 	"github.com/akrennmair/gouuid"
@@ -26,16 +26,20 @@ import (
 )
 
 func main() {
+	bind := fmt.Sprintf("%s:%s", os.Getenv("OPENSHIFT_GO_IP"), os.Getenv("OPENSHIFT_GO_PORT"))
+	datafile := fmt.Sprintf("%s/data.db", os.Getenv("OPENSHIFT_DATA_DIR"))
+	front := fmt.Sprintf("http://%s", os.Getenv("OPENSHIFT_APP_DNS"))
+		
 	var (
-		listenAddr  = flag.String("listen", "localhost:8080", "listen address")
-		dataFile    = flag.String("datafile", "./data.db", "path to data file")
+		listenAddr  = flag.String("listen", bind, "listen address")
+		dataFile    = flag.String("datafile",datafile, "path to data file")
 		username    = flag.String("user", "admin", "user name for operations requiring authentication")
-		password    = flag.String("pass", "", "password for operations requiring authentication")
-		frontend    = flag.String("frontend", "", "front-facing URL for the file delivery")
+		password    = flag.String("pass", "test", "password for operations requiring authentication")
+		frontend    = flag.String("frontend", front, "front-facing URL for the file delivery")
 		parent      = flag.String("parent", "", "parent server URL, e.g. http://otherserver:8080")
 		forceParent = flag.Bool("forceparent", false, "if enabled, forces instance to act as a parent even though it replicates from another parent server")
 	)
-
+ 
 	flag.Parse()
 
 	log.SetFlags(log.LstdFlags | log.Lshortfile)
